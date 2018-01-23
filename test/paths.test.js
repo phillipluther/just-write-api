@@ -22,7 +22,7 @@ describe('lib/paths.js', () => {
 
         function removeTestContent() {
             fs.removeSync(paths.CONTENT);
-        };
+        }
 
         before(removeTestContent);
         after(removeTestContent);
