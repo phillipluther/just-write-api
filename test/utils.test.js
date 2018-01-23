@@ -11,6 +11,7 @@ describe('lib/utils.js', () => {
     });
 
 
+    /*
     describe('{ApiError}', () => {
         let {ApiError} = utils;
         let instance;
@@ -40,6 +41,7 @@ describe('lib/utils.js', () => {
             assert(instance.request === 'UNKNOWN test');
         });
     });
+    */
 
 
     describe('{log}', () => {
