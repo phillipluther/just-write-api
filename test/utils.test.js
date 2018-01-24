@@ -3,6 +3,7 @@
 const assert = require('assert');
 const utils = require('../lib/utils');
 const colors = require('colors/safe');
+const {MockRequest, MockResponse} = require('./env');
 
 
 describe('lib/utils.js', () => {
@@ -11,37 +12,82 @@ describe('lib/utils.js', () => {
     });
 
 
-    /*
-    describe('{ApiError}', () => {
-        let {ApiError} = utils;
-        let instance;
+    describe('{applyFilters}', () => {
+        let {applyFilters} = utils;
+        let nameFilter = {name: 'Same'};
+        let noMatchFilter = {nothing: 'here'};
+        let multipleFilter = {
+            name: 'Same',
+            num: 1,
+        };
+        let data = [
+            {
+                name: 'Same',
+                num: 1,
+                id: 'd1',
+            },
+            {
+                name: 'Same',
+                num: 2,
+                id: 'd2',
+            },
+            {
+                name: 'Different',
+                num: 3,
+                id: 'd3',
+            },
+        ];
 
-        beforeEach(() => {
-            instance = new ApiError();
+        it('should be a function', () => {
+            assert(typeof applyFilters === 'function');
         });
 
-        it('should be a constructor function', () => {
-            assert(typeof ApiError === 'function');
-            assert(instance instanceof ApiError);
+        it('should accept a data array and a filter object', () => {
+            applyFilters([], {});
         });
 
-        it('should contain default status, message, and request properties', () => {
-            assert(typeof instance.status === 'number');
-            assert(typeof instance.message === 'string');
-            assert(typeof instance.request === 'string');
+        it('should return an array', () => {
+            assert(Array.isArray(applyFilters(data, {})));
         });
 
-        it('should take custom status, message, and request properties', () => {
-            instance = new ApiError(999, 'Test message', {
-                path: 'test',
-            });
+        it('should return an empty array if no matches are found', () => {
+            let results = applyFilters(data, noMatchFilter);
+            assert(results.length === 0);
+        });
 
-            assert(instance.status === 999);
-            assert(instance.message === 'Test message');
-            assert(instance.request === 'UNKNOWN test');
+        it('should return an array of matched results', () => {
+            let results = applyFilters(data, nameFilter);
+            assert(results.length === 2);
+        });
+
+        it('should handle multiple filters as "and"', () => {
+            let results = applyFilters(data, multipleFilter);
+            assert(results.length === 1);
         });
     });
-    */
+
+
+    describe('{handleErrorResponse}', () => {
+        let {handleErrorResponse} = utils;
+        let err, req, res;
+
+        beforeEach(() => {
+            req = new MockRequest();
+            res = new MockResponse();
+            err = {
+                message: 'Test response',
+                status: 400,
+            };
+        });
+
+        it('should be a function', () => {
+            assert(typeof handleErrorResponse === 'function');
+        });
+
+        it('should accept a req, res, and err params', () => {
+            handleErrorResponse(req, res, err);
+        });
+    });
 
 
     describe('{log}', () => {
@@ -75,6 +121,38 @@ describe('lib/utils.js', () => {
 
         it('should accept error objects for custom handling', () => {
             log(new Error());
+        });
+    });
+
+
+    describe('{StatusError}', () => {
+        let {StatusError} = utils;
+        let instance;
+
+        beforeEach(() => {
+            instance = new StatusError();
+        });
+
+        it('should be a constructor function', () => {
+            assert(typeof StatusError === 'function');
+            assert(instance instanceof StatusError);
+        });
+
+        it('should contain default status and message properties', () => {
+            assert(typeof instance.status === 'number');
+            assert(typeof instance.message === 'string');
+        });
+
+        it('should take custom status and message properties', () => {
+            instance = new StatusError(999, 'Test message');
+
+            assert(instance.status === 999);
+            assert(instance.message === 'Test message');
+        });
+
+        it('should use a standard message based on status if message is not provided', () => {
+            instance = new StatusError(404);
+            assert(instance.message === 'Not found');
         });
     });
 
