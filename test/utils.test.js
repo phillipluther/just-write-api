@@ -87,6 +87,105 @@ describe('lib/utils.js', () => {
         it('should accept a req, res, and err params', () => {
             handleErrorResponse(req, res, err);
         });
+
+        it('should status a response if provided by the error object', () => {
+            handleErrorResponse(req, res, err);
+            assert(res.status === 400);
+        });
+
+        it('should 500 a response if no status is provided by the error', () => {
+            delete err.status;
+            handleErrorResponse(req, res, err);
+            assert(res.status === 500);
+        });
+
+        it('should send an error response if provided', () => {
+            handleErrorResponse(req, res, err);
+            assert(res.send === err.message);
+        });
+
+        it('should send a generic status message if not provided by the error', () => {
+            delete err.message;
+            handleErrorResponse(req, res, err);
+            assert(res.send === 'Bad request'); // 400 status
+        });
+    });
+
+
+    describe('{handleSuccessResponse}', () => {
+        let {handleSuccessResponse} = utils;
+        let data, req, res;
+
+        beforeEach(() => {
+            data = {
+                test: 'OK'
+            };
+            req = new MockRequest();
+            res = new MockResponse();
+        });
+
+        it('should be a function', () => {
+            assert(typeof handleSuccessResponse === 'function');
+        });
+
+        it('should take a req, res, data, and status param', () => {
+            handleSuccessResponse(req, res, {}, 201);
+        });
+
+        it('should send a default 200 status response', () => {
+            handleSuccessResponse(req, res, {});
+            assert(res.status === 200);
+        });
+
+        it('should send a custom status response if provided', () => {
+            handleSuccessResponse(req, res, {}, 999);
+            assert(res.status === 999);
+        });
+
+        it('should send the given data as JSON', () => {
+            handleSuccessResponse(req, res, data);
+            assert(res.json === data);
+        });
+    });
+
+
+    describe('{hasValue}', () => {
+        let {hasValue} = utils;
+
+        it('should be a function', () => {
+            assert(typeof hasValue === 'function');
+        });
+
+        it('should take a single value param of a primitive type', () => {
+            hasValue('a');
+            hasValue(true);
+            hasValue({});
+            hasValue([]);
+            hasValue(1);
+            hasValue(() => false);
+        });
+
+        it('should return TRUE on success', () => {
+            assert(hasValue(1) === true);
+        });
+
+        it('should return FALSE if a given value is undefined or null', () => {
+            let undef;
+            let nulled = null;
+
+            assert(hasValue(undef) === false);
+            assert(hasValue(nulled) === false);
+        });
+
+        it('should return FALSE if a given string is empty', () => {
+            assert(hasValue('') === false);
+            assert(hasValue('        ') === false);
+        });
+
+        it('should return FALSE if a given number is NaN', () => {
+            let nan = 10 / 'a';
+            assert(hasValue(nan) === false);
+        });
     });
 
 

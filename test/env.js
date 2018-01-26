@@ -4,16 +4,6 @@ process.env.NODE_ENV = 'test';
 process.env.CONTENT_FOLDER = 'testContent';
 
 
-//const fs = require('fs-extra');
-//const paths = require('../lib/paths');
-
-
-//
-exports.createTestContent = () => {
-    //fs.ensureDirSync
-};
-
-
 //
 exports.MockRequest = function(method='GET', path='mock/request', query={}) {
     this.method = method;
@@ -38,4 +28,30 @@ exports.MockResponse = function() {
         this.status = status;
         return this;
     };
+};
+
+
+//
+exports.MockRouter = function() {
+    this.delete = (handler) => {
+        this.delete = handler;
+        return this;
+    };
+
+    this.get = (handler) => {
+        this.get = handler;
+        return this;
+    };
+
+    this.post = (handler) => {
+        this.post = handler;
+        return this;
+    };
+
+    this.put = (handler) => {
+        this.put = handler;
+        return this;
+    };
+
+    this.route = () => this;
 };

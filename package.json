@@ -22,7 +22,8 @@
     "dev": "nodemon --ignore content --ignore test lib/cli.js",
     "lint": "eslint .",
     "start": "node lib/cli.js",
-    "test": "nyc mocha --require test/env.js"
+    "test": "nyc mocha --require test/env.js 'test/**/*.test.js'",
+    "test-watch": "mocha --watch --reporter min --require test/env.js 'test/**/*.test.js'"
   },
   "bin": {
     "just-write-api": "node lib/cli.js"
