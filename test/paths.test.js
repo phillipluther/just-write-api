@@ -13,7 +13,7 @@ describe('lib/paths.js', () => {
     it('should export paths to our content folder and data files', () => {
         assert(typeof paths.CONTENT === 'string');
         assert(typeof paths.TAG_DATA === 'string');
-        assert(typeof paths.POST_DATA === 'string');
+        assert(typeof paths.PAGE_DATA === 'string');
     });
 
 
@@ -36,7 +36,7 @@ describe('lib/paths.js', () => {
             ensure().then(() => {
                 assert(fs.pathExistsSync(paths.CONTENT));
                 assert(fs.pathExistsSync(paths.TAG_DATA));
-                assert(fs.pathExistsSync(paths.POST_DATA));
+                assert(fs.pathExistsSync(paths.PAGE_DATA));
 
                 done();
             }).catch(done);

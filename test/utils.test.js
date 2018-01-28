@@ -293,4 +293,48 @@ describe('lib/utils.js', () => {
             assert(summary === 'GET test/endpoint?name=param1&slug=param2');
         });
     });
+
+    describe('{validate}', () => {
+        let {validate} = utils;
+        let mockPeers = [
+            {
+                id: 'a1',
+                val1: '1',
+                val2: 1,
+            },
+            {
+                id: 'b2',
+                val1: '2',
+                val2: 2,
+            }
+        ];
+
+        it('should be a function', () => {
+            assert(typeof validate === 'function');
+        });
+
+        it('should accept an object to validate, its peers, and a validation set', () => {
+            validate({}, [], {});
+        });
+
+        it('should return TRUE if an object is valid', () => {
+            assert(validate({}, []) === true);
+        });
+
+        it('should return a validation error message if a required value is missing', () => {
+            let validation = validate({}, [], {
+                required: ['val1']
+            });
+
+            assert(typeof validation === 'string');
+        });
+
+        it('should return a validation error message if a specified value is not unique amongst peers', () => {
+            let validation = validate({val1: '1'}, mockPeers, {
+                unique: ['val1']
+            });
+
+            assert(typeof validation === 'string');
+        });
+    });
 });
