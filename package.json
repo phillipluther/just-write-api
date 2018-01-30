@@ -31,5 +31,12 @@
   },
   "keywords": [],
   "author": "Phillip Luther",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:phillipluther/just-write-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/phillipluther/just-write-api/issues"
+  },
   "license": "MIT"
 }
