@@ -3,7 +3,7 @@
 const assert = require('assert');
 const utils = require('../lib/utils');
 const colors = require('colors/safe');
-const {MockRequest, MockResponse} = require('./env');
+const {MockRequest, MockResponse} = require('./helpers/mocks');
 
 
 describe('lib/utils.js', () => {
