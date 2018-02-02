@@ -19,44 +19,30 @@ const {
 
 
 describe('lib/endpoints/page.js', () => {
-    let endpoint, fakeRouter, fakeRequest, fakeResponse, pageData;
+    let handler;
 
     //
-    function augmentRequest() {
-        let pages = pageData;
-
-        if (!pages) {
-            pages = fs.readJsonSync(testContentPages);
-            pageData = pages;
-        }
-
-        let random = Math.floor(Math.random() * pages.length);
-        let page = pages[random];
-
-        fakeRequest.page = page;
-        fakeRequest.pages = pages;
-    }
-
-
-    before(done => {
-        ensureTestContent()
-            .then(() => done())
-            .catch(done);
-    });
-
-    beforeEach(() => {
-        createTestContent();
-
-        fakeRouter = new MockRouter();
-        fakeResponse = new MockResponse();
-        fakeRequest = new MockRequest({
+    function createRequest(providePageData) {
+        let req = new MockRequest({
             params: {
                 id: 'p1',
             },
             query: {},
         });
 
-        endpoint = page(fakeRouter);
+        if (providePageData) {
+            req.pages = fs.readJsonSync(testContentPages);
+            req.page = req.pages[0];
+        }
+
+        return req;
+    }
+
+    before(done => {
+        handler = page(new MockRouter());
+        ensureTestContent()
+            .then(() => done())
+            .catch(done);
     });
 
     it('should be a function', () => {
@@ -69,11 +55,18 @@ describe('lib/endpoints/page.js', () => {
 
 
     describe('{all}', () => {
+        let req, res;
 
-        it('should pre-fetch all page data, appending the req', (done) => {
-            endpoint.all(fakeRequest, fakeResponse, () => true)
+        beforeEach(() => {
+            createTestContent();
+            req = createRequest();
+            res = new MockResponse;
+        });
+
+        it('should pre-fetch all page data and attach it to the request', (done) => {
+            handler.all(req, res, () => true)
                 .then(() => {
-                    let pages = fakeRequest.pages;
+                    let pages = req.pages;
 
                     assert(typeof pages !== 'undefined');
                     assert(Array.isArray(pages));
@@ -86,10 +79,10 @@ describe('lib/endpoints/page.js', () => {
                 .catch(done);
         });
 
-        it('should pre-fetch the page by ID, appending the req', (done) => {
-            endpoint.all(fakeRequest, fakeResponse, () => true)
+        it('should pre-fetch the page and attach it to the request', (done) => {
+            handler.all(req, res, () => true)
                 .then(() => {
-                    let page = fakeRequest.page;
+                    let page = req.page;
 
                     assert(typeof page !== 'undefined');
                     assert(page.id === 'p1');
@@ -98,12 +91,12 @@ describe('lib/endpoints/page.js', () => {
                 .catch(done);
         });
 
-        it('should respond with a 404 error if a given ID is not found', (done) => {
-            fakeRequest.params.id = 'gibberish';
+        it('should respond with a 404 error if a request ID is not found', (done) => {
+            req.params.id = 'gibberish';
 
-            endpoint.all(fakeRequest, fakeResponse, () => true)
+            handler.all(req, res, () => true)
                 .then(() => {
-                    assert(fakeResponse.status === 404);
+                    assert(res.status === 404);
                     done();
                 })
                 .catch(done);
@@ -113,29 +106,39 @@ describe('lib/endpoints/page.js', () => {
             let nextCalled = false;
             let callNext = () => nextCalled = true;
 
-            endpoint.all(fakeRequest, fakeResponse, callNext)
-                .then(() => done())
+            handler.all(req, res, callNext)
+                .then(() => {
+                    assert(nextCalled === true);
+                    done();
+                })
                 .catch(done);
         });
     });
 
 
     describe('{delete}', () => {
-        beforeEach(augmentRequest);
+        let req, res;
+
+        beforeEach(() => {
+            createTestContent();
+            req = createRequest(true);
+            res = new MockResponse();
+        });
+
 
         it('should be a function', () => {
-            assert(typeof endpoint.delete === 'function');
+            assert(typeof handler.delete === 'function');
         });
 
         it('should take an express request and response object', () => {
-            endpoint.delete(fakeRequest, fakeResponse);
+            handler.delete(req, res);
         });
 
-        it('should delete the specified page by ID', (done) => {
-            endpoint.delete(fakeRequest, fakeResponse)
+        it('should delete the specified object from the data file', (done) => {
+            handler.delete(req, res)
                 .then(() => {
                     let updatedPages = fs.readJsonSync(testContentPages);
-                    let match = updatedPages.filter(p => p.id === fakeRequest.page.id);
+                    let match = updatedPages.filter(p => p.id === req.page.id);
 
                     assert(updatedPages.length === 2);
                     assert(match.length === 0);
@@ -146,10 +149,10 @@ describe('lib/endpoints/page.js', () => {
         });
 
         it('should send a 200 response and the updated pages JSON on success', (done) => {
-            endpoint.delete(fakeRequest, fakeResponse)
+            handler.delete(req, res)
                 .then(() => {
-                    assert(fakeResponse.status === 200);
-                    assert(fakeResponse.json.length === 2);
+                    assert(res.status === 200);
+                    assert(res.json.length === 2);
                     done();
                 })
                 .catch(done);
@@ -158,21 +161,99 @@ describe('lib/endpoints/page.js', () => {
 
 
     describe('{get}', () => {
-        beforeEach(augmentRequest);
+        let req, res;
+
+        beforeEach(() => {
+            createTestContent();
+            req = createRequest(true);
+            res = new MockResponse();
+        });
+
 
         it('should be a function', () => {
-            assert(typeof endpoint.get === 'function');
+            assert(typeof handler.get === 'function');
         });
 
         it('should take an express request and response object', () => {
-            endpoint.get(fakeRequest, fakeResponse);
+            handler.get(req, res);
         });
 
-        it('should send a 200 response and the requested object', () => {
-            endpoint.get(fakeRequest, fakeResponse);
+        it('should send a 200 response and the requested object on success', () => {
+            handler.get(req, res);
 
-            assert(fakeResponse.status === 200);
-            assert(fakeResponse.json.id === fakeRequest.params.id);
+            assert(res.status === 200);
+            assert(typeof res.json === 'object');
+
+            // not really doing anything, as mock page data is provided and the GET
+            // handler itself isn't doing the needle/haystack search ... upstream
+            // ALL is.
+            assert(res.json.id === req.params.id);
+        });
+    });
+
+
+    describe('{put}', () => {
+        let req, res;
+
+        beforeEach(() => {
+            createTestContent();
+            req = createRequest(true);
+            res = new MockResponse();
+        });
+
+
+        it('should be a function', () => {
+            assert(typeof handler.put === 'function');
+        });
+
+        it('should take an express request and response object', () => {
+            handler.put(req, res);
+        });
+
+        it('should fail validation if a `title` property is not provided', () => {
+            req.page.title = null;
+
+            // validation fails before our async processes kicked off; nothing to
+            // await
+            handler.put(req, res);
+
+            assert(res.status === 400);
+            assert(typeof res.send === 'string');
+        });
+
+        it('should fail validation if a `content` property is not provided', () => {
+            req.page.content = '';
+            handler.put(req, res);
+
+            assert(res.status === 400);
+            assert(typeof res.send === 'string');
+        });
+
+        it('should send a 200 response with the updated, time-stamped resource on success', (done) => {
+            req.page.title = 'Updated Title';
+
+            handler.put(req, res)
+                .then(() => {
+                    assert(res.status === 200);
+                    assert(res.json.title === 'Updated Title');
+                    assert(res.json.updated instanceof Date);
+
+                    done();
+                })
+                .catch(done);
+        });
+
+        it('should update the data file on success', (done) => {
+            req.page.title = 'WRITTEN';
+
+            handler.put(req, res)
+                .then(() => {
+                    let updatedJson = fs.readJsonSync(testContentPages);
+
+                    assert(updatedJson[0].title === 'WRITTEN');
+                    done();
+                })
+                .catch(done);
         });
     });
 });

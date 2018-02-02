@@ -27,9 +27,7 @@ describe('lib/paths.js', () => {
         // one-off test directory for content; it'll be destroyed after these
         // tests run
         let newContentDir = 'newContent';
-
         let {ensure} = paths;
-        let ensured = false;
 
         function removeTestContent() {
             let contentPath = path.join(process.cwd(), newContentDir);
