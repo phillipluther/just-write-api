@@ -1,7 +1,7 @@
 {
   "name": "just-write-api",
   "version": "0.0.0",
-  "description": "WIP",
+  "description": "A simple API for creating and organizing content via JSON files.",
   "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.2",
@@ -30,7 +30,7 @@
   "bin": {
     "just-write-api": "lib/cli.js"
   },
-  "keywords": [],
+  "keywords": ["static", "no database", "api", "markdown"],
   "author": "Phillip Luther",
   "repository": {
     "type": "git",
