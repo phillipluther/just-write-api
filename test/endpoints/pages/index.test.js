@@ -162,7 +162,7 @@ describe('lib/endpoints/pages/index.js (/pages)', () => {
                     done();
                 })
                 .catch(done);
-        })
+        });
 
         it('should fail validation if a `title` property is not provided', () => {
             req.body.title = null;
@@ -203,7 +203,7 @@ describe('lib/endpoints/pages/index.js (/pages)', () => {
                     assert(pages.filter(p => p.id === res.json.id).length === 1);
                     done();
                 })
-                .catch(done)
+                .catch(done);
         });
 
     });

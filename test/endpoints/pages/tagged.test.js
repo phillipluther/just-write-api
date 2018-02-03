@@ -1,13 +1,10 @@
 'use strict';
 
-const fs = require('fs-extra');
 const assert = require('assert');
 const tagged = require('../../../lib/endpoints/pages/tagged');
 
 const {
-    createTestContent,
     ensureTestContent,
-    testContentPages
 } = require('../../helpers/testContent');
 
 const {
