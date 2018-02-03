@@ -15,7 +15,7 @@ exports.MockRouter = function() {
 };
 
 
-exports.MockRequest = function(options={}) {
+exports.MockRequest = function(options={query:{}}) {
     Object.keys(options).forEach(opt => {
         this[opt] = options[opt];
     });

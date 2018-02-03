@@ -63,6 +63,17 @@ describe('lib/endpoints/page.js', () => {
             res = new MockResponse;
         });
 
+        it('should ignore filters', (done) => {
+            req.query.tags = 't2';
+
+            handler.all(req, res, () => true)
+                .then(() => {
+                    assert(req.pages.length === 3);
+                    done();
+                })
+                .catch(done);
+        });
+
         it('should pre-fetch all page data and attach it to the request', (done) => {
             handler.all(req, res, () => true)
                 .then(() => {
@@ -125,15 +136,6 @@ describe('lib/endpoints/page.js', () => {
             res = new MockResponse();
         });
 
-
-        it('should be a function', () => {
-            assert(typeof handler.delete === 'function');
-        });
-
-        it('should take an express request and response object', () => {
-            handler.delete(req, res);
-        });
-
         it('should delete the specified object from the data file', (done) => {
             handler.delete(req, res)
                 .then(() => {
@@ -169,15 +171,6 @@ describe('lib/endpoints/page.js', () => {
             res = new MockResponse();
         });
 
-
-        it('should be a function', () => {
-            assert(typeof handler.get === 'function');
-        });
-
-        it('should take an express request and response object', () => {
-            handler.get(req, res);
-        });
-
         it('should send a 200 response and the requested object on success', () => {
             handler.get(req, res);
 
@@ -199,15 +192,6 @@ describe('lib/endpoints/page.js', () => {
             createTestContent();
             req = createRequest(true);
             res = new MockResponse();
-        });
-
-
-        it('should be a function', () => {
-            assert(typeof handler.put === 'function');
-        });
-
-        it('should take an express request and response object', () => {
-            handler.put(req, res);
         });
 
         it('should fail validation if a `title` property is not provided', () => {
