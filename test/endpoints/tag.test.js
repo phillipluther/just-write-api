@@ -5,8 +5,9 @@ const assert = require('assert');
 const tag = require('../../lib/endpoints/tag');
 
 const {
+    cleanTestContent,
     createTestContent,
-    ensureTestContent,
+    setTestContentPath,
     testContentTags
 } = require('../helpers/testContent');
 
@@ -40,10 +41,12 @@ describe('lib/endpoints/tag.js', () => {
 
     before(done => {
         handler = tag(new MockRouter());
-        ensureTestContent()
+        setTestContentPath()
             .then(() => done())
             .catch(done);
     });
+
+    after(cleanTestContent);
 
 
     it('should be a function', () => {

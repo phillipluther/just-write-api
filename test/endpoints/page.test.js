@@ -5,8 +5,9 @@ const assert = require('assert');
 const page = require('../../lib/endpoints/page');
 
 const {
+    cleanTestContent,
     createTestContent,
-    ensureTestContent,
+    setTestContentPath,
     testContentPages
 } = require('../helpers/testContent');
 
@@ -40,10 +41,13 @@ describe('lib/endpoints/page.js', () => {
 
     before(done => {
         handler = page(new MockRouter());
-        ensureTestContent()
+        setTestContentPath()
             .then(() => done())
             .catch(done);
     });
+
+    after(cleanTestContent);
+
 
     it('should be a function', () => {
         assert(typeof page === 'function');

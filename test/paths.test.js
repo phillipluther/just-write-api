@@ -60,7 +60,7 @@ describe('lib/paths.js', () => {
         });
 
         it('should return TRUE if the content directory already exists', (done) => {
-            ensure('test/helpers/testContent').then(exists => {
+            ensure(newContentDir).then(exists => {
                 assert(exists === true);
                 done();
 

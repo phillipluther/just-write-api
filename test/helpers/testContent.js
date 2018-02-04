@@ -4,7 +4,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const {ensure} = require('../../lib/paths');
 
-const contentDir = 'testContent';
+const contentDir = 'testContentDir';
 
 
 exports.testContentRoot = path.join(__dirname, contentDir);
@@ -16,7 +16,7 @@ exports.createTestContent = () => {
     const testContentRoot = exports.testContentRoot;
 
     // create our mock content folder
-    fs.ensureDirSync(path.join(testContentRoot));
+    fs.ensureDirSync(testContentRoot);
 
     // mock pages
     fs.writeJsonSync(path.join(testContentRoot, 'pages.json'), [
@@ -34,6 +34,10 @@ exports.createTestContent = () => {
 };
 
 
-exports.ensureTestContent = () => {
+exports.setTestContentPath = () => {
     return ensure('test/helpers/' + contentDir);
+};
+
+exports.cleanTestContent = () => {
+    fs.removeSync(exports.testContentRoot);
 };

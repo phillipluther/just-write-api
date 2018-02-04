@@ -4,8 +4,9 @@ const fs = require('fs-extra');
 const assert = require('assert');
 const tags = require('../../lib/endpoints/tags');
 const {
+    cleanTestContent,
     createTestContent,
-    ensureTestContent,
+    setTestContentPath,
     testContentTags
 } = require('../helpers/testContent');
 
@@ -21,10 +22,12 @@ describe('lib/endpoints/tags.js', () => {
 
     before(done => {
         handler = tags(new MockRouter());
-        ensureTestContent()
+        setTestContentPath()
             .then(() => done())
             .catch(done);
     });
+
+    after(cleanTestContent);
 
 
     it('should be a function', () => {
