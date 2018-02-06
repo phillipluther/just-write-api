@@ -10,16 +10,39 @@ Snag the package from NPM:
 npm install --save just-write-api
 ```
 
+### Standalone Usage
+
+The Just Write API can run as a server on Node.js.
+
 Use it programmatically:
 
 ```js
-const api = require('just-write-api');
-api([options]);
+const {server} = require('just-write-api');
+server([options]);
 ```
 
 Or start it from the command line:
 ```
 just-write-api [--content-dir content][--host localhost][--port 8001]
+```
+
+### Usage as an Express Router
+
+The API endpoints can also be included in an existing Express server. Simply
+import `endpointRouter` from the module and use it as you would any other
+Express router.
+
+```js
+const express = require('express');
+const {endpointRouter} = require('just-write-api');
+
+const app = express();
+
+app.use(endpointRouter());
+
+// or, as a nested route
+app.use('/api', endpointRouter());
+
 ```
 
 
@@ -149,5 +172,5 @@ The API has a minimal set of configuration options. All of them are optional.
 | Property | Command Line Flag | Default | Description |
 |----------|-------------------|---------|-------------|
 | contentDir | --content-dir | content | Folder where content is created and managed in the current working directory |
-| host | --host | localhost | Host name where the API server will run. |
-| port | --port | 8001 | Port the API server will run on. |
+| host | --host | localhost | Host name where the API server will run. Not available when using `endpointRouter` mode |
+| port | --port | 8001 | Port the API server will run on. Not available when using `endpointRouter` mode |
